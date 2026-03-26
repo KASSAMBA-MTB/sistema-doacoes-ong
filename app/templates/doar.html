@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Cadastro de Doação</h2>
+
+    <form method="POST">
+        <label>Nome do item:</label><br>
+        <input type="text" name="item"><br><br>
+
+        <label>Quantidade:</label><br>
+        <input type="number" name="quantidade"><br><br>
+
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <hr>
+
+    <h3>Doações cadastradas:</h3>
+
+    <ul>
+        {% for d in doacoes %}
+            <li>{{ d.item }} - {{ d.quantidade }}</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
