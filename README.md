@@ -1,18 +1,39 @@
-# Sistema de Gestão de Doações para ONGs
+# 🏢 Sistema de Gestão de Doações para ONGs
 
-Este projeto tem como objetivo gerenciar doações, estoque e distribuição de itens para instituições sociais.
+Este projeto é uma aplicação web desenvolvida com **Flask + SQLite**, com o objetivo de gerenciar doações, permitindo cadastro, edição, exclusão e controle de acesso por login.
 
-## Tecnologias
-- Python
+---
+
+## 🚀 Funcionalidades
+
+### 📦 Gestão de Doações (CRUD)
+- ✅ Cadastrar doações
+- ✅ Listar doações
+- ✅ Editar doações
+- ✅ Excluir doações com confirmação
+
+### 🔐 Autenticação
+- ✅ Login com usuário e senha
+- ✅ Sessão de usuário
+- ✅ Proteção de rotas
+- ✅ Logout
+
+### 💬 Experiência do Usuário
+- ✅ Mensagens de feedback (flash messages)
+- ✅ Confirmação antes de excluir
+- ✅ Interface responsiva com Bootstrap
+
+---
+
+## 🧰 Tecnologias Utilizadas
+
+- Python 3
 - Flask
 - SQLite
-- HTML/CSS
+- HTML5
+- Bootstrap 5
+- Jinja2
 
-## Funcionalidades atuais
-- Cadastro de doações (item e quantidade)
-- Listagem de doações em tempo real
+---
 
-Funcionalidades futuras
-- Cadastro de doadores
-- Controle de estoque
-- Registro de entradas e saídas
+## 📂 Estrutura do Projeto
