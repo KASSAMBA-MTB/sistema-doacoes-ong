@@ -1,26 +1,6 @@
-from flask import Blueprint, render_template, request, redirect
+from app import create_app
 
-main = Blueprint('main', __name__)
+app = create_app()
 
-doacoes = []
-
-@main.route('/')
-def home():
-    return render_template('home.html')
-
-
-@main.route('/doar', methods=['GET', 'POST'])
-def doar():
-    if request.method == 'POST':
-        item = request.form.get('item')
-        quantidade = request.form.get('quantidade')
-
-        if item and quantidade:
-            doacoes.append({
-                'item': item,
-                'quantidade': quantidade
-            })
-
-        return redirect('/doar')
-
-    return render_template('doar.html', doacoes=doacoes)
+if __name__ == "__main__":
+    app.run(debug=True)

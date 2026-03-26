@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Editar Doação</h2>
+
+    <form method="POST">
+        <label>Nome do item:</label><br>
+        <input type="text" name="item" value="{{ doacao[0] }}"><br><br>
+
+        <label>Quantidade:</label><br>
+        <input type="number" name="quantidade" value="{{ doacao[1] }}"><br><br>
+
+        <button type="submit">Atualizar</button>
+    </form>
+{% endblock %}
