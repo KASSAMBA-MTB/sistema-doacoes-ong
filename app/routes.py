@@ -1,15 +1,47 @@
+from flask import Blueprint, render_template, request, redirect, flash, session
 from database import conectar
-from flask import Blueprint, render_template, request, redirect
 
+# 🔥 PRIMEIRO: cria o blueprint
 main = Blueprint('main', __name__)
 
+
+# 🔐 LOGIN
+@main.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        usuario = request.form.get('usuario')
+        senha = request.form.get('senha')
+
+        if usuario == 'admin' and senha == '123':
+            session['usuario'] = usuario
+            flash('Login realizado com sucesso!')
+            return redirect('/doar')
+        else:
+            flash('Usuário ou senha inválidos')
+
+    return render_template('login.html')
+
+
+# 🔓 LOGOUT
+@main.route('/logout')
+def logout():
+    session.pop('usuario', None)
+    flash('Logout realizado com sucesso!')
+    return redirect('/login')
+
+
+# 🏠 HOME
 @main.route('/')
 def home():
-    return render_template('home.html')
+    return redirect('/login')
 
 
+# 📦 DOAÇÕES
 @main.route('/doar', methods=['GET', 'POST'])
 def doar():
+    if 'usuario' not in session:
+        return redirect('/login')
+
     if request.method == 'POST':
         item = request.form.get('item')
         quantidade = request.form.get('quantidade')
@@ -26,9 +58,10 @@ def doar():
             conn.commit()
             conn.close()
 
+            flash('Doação cadastrada com sucesso!')
+
         return redirect('/doar')
 
-    # 🔥 BUSCA DO BANCO (COM ID)
     conn = conectar()
     cursor = conn.cursor()
 
@@ -40,9 +73,12 @@ def doar():
     return render_template('doar.html', doacoes=doacoes)
 
 
-# 🔥 ROTA DE EXCLUSÃO (FORA DA FUNÇÃO)
+# ❌ EXCLUIR
 @main.route('/excluir/<int:id>')
 def excluir(id):
+    if 'usuario' not in session:
+        return redirect('/login')
+
     conn = conectar()
     cursor = conn.cursor()
 
@@ -51,9 +87,17 @@ def excluir(id):
     conn.commit()
     conn.close()
 
+    flash('Doação excluída com sucesso!')
+
     return redirect('/doar')
+
+
+# ✏ EDITAR
 @main.route('/editar/<int:id>', methods=['GET', 'POST'])
 def editar(id):
+    if 'usuario' not in session:
+        return redirect('/login')
+
     conn = conectar()
     cursor = conn.cursor()
 
@@ -61,17 +105,19 @@ def editar(id):
         item = request.form.get('item')
         quantidade = request.form.get('quantidade')
 
-        cursor.execute(
-            "UPDATE doacoes SET item = ?, quantidade = ? WHERE id = ?",
-            (item, quantidade, id)
-        )
+        if item and quantidade:
+            cursor.execute(
+                "UPDATE doacoes SET item = ?, quantidade = ? WHERE id = ?",
+                (item, quantidade, id)
+            )
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+            conn.close()
 
-        return redirect('/doar')
+            flash('Doação atualizada com sucesso!')
 
-    # GET → buscar dados atuais
+            return redirect('/doar')
+
     cursor.execute("SELECT item, quantidade FROM doacoes WHERE id = ?", (id,))
     doacao = cursor.fetchone()
 

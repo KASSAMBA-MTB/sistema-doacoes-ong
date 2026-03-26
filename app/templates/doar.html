@@ -1,32 +1,51 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Cadastro de Doação</h2>
 
-    <form method="POST">
-        <label>Nome do item:</label><br>
-        <input type="text" name="item" required><br><br>
+<h2 class="mb-4">Cadastro de Doação</h2>
 
-        <label>Quantidade:</label><br>
-        <input type="number" name="quantidade" required><br><br>
+<form method="POST" class="mb-4">
+    <div class="mb-3">
+        <label class="form-label">Nome do item</label>
+        <input type="text" name="item" class="form-control" required>
+    </div>
 
-        <button type="submit">Cadastrar</button>
-    </form>
+    <div class="mb-3">
+        <label class="form-label">Quantidade</label>
+        <input type="number" name="quantidade" class="form-control" required>
+    </div>
 
-    <hr>
+    <button type="submit" class="btn btn-success">Cadastrar</button>
+</form>
 
-    <h3>Doações cadastradas:</h3>
+<hr>
 
-    <ul>
-        <ul>
-    {% for id, item, quantidade in doacoes %}
-        <li>
-            {{ item }} - {{ quantidade }}
-            <a href="/editar/{{ id }}">✏ Editar</a>
-            <a href="/excluir/{{ id }}">❌ Excluir</a>
-        </li>
-    {% endfor %}
-</ul>
-    </ul>
+<h3 class="mb-3">Doações cadastradas</h3>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Item</th>
+            <th>Quantidade</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for id, item, quantidade in doacoes %}
+        <tr>
+            <td>{{ item }}</td>
+            <td>{{ quantidade }}</td>
+            <td>
+                <a href="/editar/{{ id }}" class="btn btn-warning btn-sm">✏ Editar</a>
+                <a href="/excluir/{{ id }}" 
+   class="btn btn-danger btn-sm"
+   onclick="return confirm('Tem certeza que deseja excluir esta doação?')">
+   ❌ Excluir
+</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}
