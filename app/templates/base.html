@@ -4,33 +4,43 @@
     <meta charset="UTF-8">
     <title>Sistema de Doações</title>
 
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
 
+</head>
 <body class="bg-light">
 
-<div class="container mt-5">
+    <!-- 🔝 NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/doar">💙 Doações ONG</a>
 
-    <div class="card shadow p-4">
+            <div class="d-flex">
+                {% if session.usuario %}
+                    <span class="text-white me-3">
+                        👤 {{ session.usuario }}
+                    </span>
+                    <a href="/logout" class="btn btn-light btn-sm">Sair</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
 
-        <h1 class="text-center mb-4">Sistema de Doações ONG</h1>
+    <div class="container mt-4">
 
-        <!-- 🔥 MENSAGENS FLASH -->
+        <!-- 🔔 MENSAGENS -->
         {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for msg in messages %}
-                    <div class="alert alert-success">
-                        {{ msg }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+          {% if messages %}
+            {% for msg in messages %}
+              <div class="alert alert-info">{{ msg }}</div>
+            {% endfor %}
+          {% endif %}
         {% endwith %}
 
+        <!-- 📦 CONTEÚDO -->
         {% block content %}{% endblock %}
 
     </div>
-
-</div>
 
 </body>
 </html>

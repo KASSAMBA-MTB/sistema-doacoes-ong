@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">📊 Dashboard</h2>
+
+<div class="row mb-4">
+
+    <div class="col-md-6">
+        <div class="card text-center shadow p-4">
+            <h5>Total de Doações</h5>
+            <h2>{{ total_doacoes }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card text-center shadow p-4">
+            <h5>Total de Itens</h5>
+            <h2>{{ total_itens }}</h2>
+        </div>
+    </div>
+
+</div>
+
+<!-- 📊 GRÁFICO DE BARRAS -->
+<div class="card shadow p-4">
+    <h5 class="mb-3">Distribuição de Doações</h5>
+    <canvas id="grafico"></canvas>
+</div>
+
+<!-- 🥧 GRÁFICO DE PIZZA -->
+<div class="card shadow p-4 mt-4">
+    <h5 class="mb-3">Proporção de Doações</h5>
+    <canvas id="graficoPizza"></canvas>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // 🔐 Proteção total contra erro
+    const labels = {{ labels | default([]) | tojson | safe }};
+    const data = {{ valores | default([]) | tojson | safe }};
+
+    // 📊 GRÁFICO DE BARRAS
+    const ctx = document.getElementById('grafico').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Quantidade',
+                data: data
+            }]
+        }
+    });
+
+    // 🥧 GRÁFICO DE PIZZA
+    const ctxPizza = document.getElementById('graficoPizza').getContext('2d');
+
+    new Chart(ctxPizza, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data
+            }]
+        }
+    });
+</script>
+
+{% endblock %}
