@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, flash, session
 from werkzeug.security import check_password_hash, generate_password_hash
+from functools import wraps
 from database import conectar
 
 main = Blueprint('main', __name__)
@@ -7,21 +8,31 @@ main = Blueprint('main', __name__)
 
 # 🔐 PROTEÇÃO
 def login_required(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         if 'usuario' not in session:
             flash('Faça login para acessar o sistema')
-            return redirect('/login')
+            return redirect('/login?next=' + request.path)
         return func(*args, **kwargs)
-    wrapper.__name__ = func.__name__
     return wrapper
+
+
+# 🏠 HOME
+@main.route('/')
+def home():
+    return redirect('/login')
 
 
 # 🔐 LOGIN
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        usuario = request.form.get('usuario')
-        senha = request.form.get('senha')
+        usuario = request.form.get('usuario', '').strip()
+        senha = request.form.get('senha', '').strip()
+
+        if not usuario or not senha:
+            flash('Preencha todos os campos')
+            return redirect('/login')
 
         conn = conectar()
         cursor = conn.cursor()
@@ -37,9 +48,18 @@ def login():
         if resultado and check_password_hash(resultado[1], senha):
             session['usuario'] = resultado[0]
             flash('Login realizado com sucesso!')
-            return redirect('/dashboard')
+
+            next_page = request.form.get('next') or request.args.get('next')
+
+            # 🔥 CORREÇÃO FINAL (evita /None e garante rota válida)
+            if not next_page or not next_page.startswith('/'):
+                next_page = '/dashboard'
+
+            return redirect(next_page)
+
         else:
             flash('Usuário ou senha inválidos')
+            return redirect('/login')
 
     return render_template('login.html')
 
@@ -93,12 +113,6 @@ def logout():
     return redirect('/login')
 
 
-# 🏠 HOME
-@main.route('/')
-def home():
-    return redirect('/login')
-
-
 # 📦 DOAÇÕES
 @main.route('/doar', methods=['GET', 'POST'])
 @login_required
@@ -106,12 +120,10 @@ def doar():
     conn = conectar()
     cursor = conn.cursor()
 
-    # 🔎 Captura filtros
     busca = request.args.get('busca')
     data_inicio = request.args.get('data_inicio')
     data_fim = request.args.get('data_fim')
 
-    # 📦 CADASTRO
     if request.method == 'POST':
         item = request.form.get('item')
         quantidade = request.form.get('quantidade')
@@ -125,7 +137,6 @@ def doar():
             flash('Doação cadastrada com sucesso!')
             return redirect('/doar')
 
-    # 🔥 CONSULTA COM FILTRO COMPLETO
     query = "SELECT id, item, quantidade, data FROM doacoes WHERE 1=1"
     params = []
 
@@ -153,6 +164,7 @@ def doar():
         data_inicio=data_inicio,
         data_fim=data_fim
     )
+
 
 # ❌ EXCLUIR
 @main.route('/excluir/<int:id>')
@@ -204,21 +216,19 @@ def editar(id):
     return render_template('editar.html', doacao=doacao, id=id)
 
 
-# 📊 DASHBOARD (VERSÃO BLINDADA)
+# 📊 DASHBOARD
 @main.route('/dashboard')
 @login_required
 def dashboard():
     conn = conectar()
     cursor = conn.cursor()
 
-    # Totais
     cursor.execute("SELECT COUNT(*) FROM doacoes")
     total_doacoes = cursor.fetchone()[0] or 0
 
     cursor.execute("SELECT SUM(quantidade) FROM doacoes")
     total_itens = cursor.fetchone()[0] or 0
 
-    # 📊 Dados do gráfico
     cursor.execute("""
         SELECT item, SUM(quantidade)
         FROM doacoes

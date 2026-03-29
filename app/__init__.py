@@ -2,6 +2,7 @@ from flask import Flask
 
 def create_app():
     app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'chave-super-secreta-123'
 
     # 🔐 Chave secreta (em produção o ideal é usar variável de ambiente)
     app.config['SECRET_KEY'] = 'chave_secreta'
