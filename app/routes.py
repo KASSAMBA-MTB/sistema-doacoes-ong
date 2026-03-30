@@ -3,7 +3,19 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
 from database import conectar
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'usuario' not in session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated_function
+
 main = Blueprint('main', __name__)
+
+@main.route('/')
+def teste():
+    return "OK FUNCIONANDO"
 
 
 # 🔐 PROTEÇÃO
@@ -216,27 +228,35 @@ def editar(id):
     return render_template('editar.html', doacao=doacao, id=id)
 
 
-# 📊 DASHBOARD
 @main.route('/dashboard')
 @login_required
 def dashboard():
     conn = conectar()
     cursor = conn.cursor()
 
+    # KPIs
     cursor.execute("SELECT COUNT(*) FROM doacoes")
     total_doacoes = cursor.fetchone()[0] or 0
 
     cursor.execute("SELECT SUM(quantidade) FROM doacoes")
     total_itens = cursor.fetchone()[0] or 0
 
+    # AGRUPAMENTO + ORDENAÇÃO
     cursor.execute("""
-        SELECT item, SUM(quantidade)
+        SELECT item, SUM(quantidade) as total
         FROM doacoes
         GROUP BY item
+        ORDER BY total DESC
     """)
 
     dados = cursor.fetchall()
 
+    # TOP 3 ITENS
+    top_itens = []
+    if dados:
+        top_itens = dados[:3]
+
+    # LISTAS PARA GRÁFICO
     labels = []
     valores = []
 
@@ -248,9 +268,10 @@ def dashboard():
     conn.close()
 
     return render_template(
-        "dashboard.html",
+        'dashboard.html',
         total_doacoes=total_doacoes,
         total_itens=total_itens,
         labels=labels,
-        valores=valores
+        valores=valores,
+        top_itens=top_itens
     )
