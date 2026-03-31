@@ -29,7 +29,7 @@ Este projeto é uma aplicação web desenvolvida com **Flask + SQLite**, com o o
 
 - Python 3
 - Flask
-- SQLite
+- PostgreSQL
 - HTML5
 - Bootstrap 5
 - Jinja2
