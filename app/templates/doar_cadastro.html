@@ -6,18 +6,6 @@
     <a href="/doar" class="btn btn-secondary">← Voltar para lista</a>
 </div>
 
-<!-- 🔔 Flash Messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, msg in messages %}
-      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-        {{ msg }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-
 <form method="POST" action="/doar/cadastrar">
     <div class="mb-3">
         <input type="text" name="item" class="form-control" placeholder="Item" required>
