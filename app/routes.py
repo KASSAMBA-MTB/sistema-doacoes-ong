@@ -150,6 +150,7 @@ def doar():
             return redirect('/doar')
 
     query = "SELECT id, item, quantidade, data FROM doacoes WHERE 1=1"
+    query += " ORDER BY data DESC"
     params = []
 
     if busca:
@@ -165,8 +166,19 @@ def doar():
         params.append(data_fim)
 
     cursor.execute(query, params)
-    doacoes = cursor.fetchall()
+    dados = cursor.fetchall()
 
+    from datetime import datetime
+
+    doacoes = [
+        {
+            "id": d[0],
+            "item": d[1],
+            "quantidade": d[2],
+            "data": datetime.strptime(d[3], "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M") if d[3] else None
+        }
+        for d in dados
+    ] 
     conn.close()
 
     return render_template(
@@ -179,7 +191,7 @@ def doar():
 
 
 # ❌ EXCLUIR
-@main.route('/excluir/<int:id>')
+@main.route('/excluir/<int:id>', methods=['POST'])
 @login_required
 def excluir(id):
     conn = conectar()
