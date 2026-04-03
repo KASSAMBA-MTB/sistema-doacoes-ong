@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📋 Lista de Doações</h2>
+    <a href="/doar/cadastrar" class="btn btn-success">➕ Adicionar Doação</a>
+</div>
+
+<!-- 🔔 Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, msg in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<table class="table table-striped table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Item</th>
+            <th>Quantidade</th>
+            <th>Data</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in doacoes %}
+        <tr>
+            <td>{{ d.item }}</td>
+            <td>{{ d.quantidade }}</td>
+            <td>{{ d.data }}</td>
+            <td>
+                <a href="/editar/{{ d.id }}" class="btn btn-warning btn-sm">Editar</a>
+                <form method="POST" action="/excluir/{{ d.id }}" style="display:inline;">
+                    <button class="btn btn-danger btn-sm" type="submit">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4" class="text-center">Nenhuma doação cadastrada</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
