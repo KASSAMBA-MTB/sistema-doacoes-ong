@@ -1,6 +1,5 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 
 from apps.usuarios.decorators import login_required
@@ -33,7 +32,7 @@ def listar_doacoes(request):
     return render(request, "doacoes/doar_lista.html", {"doacoes": doacoes, "active": "lista"})
 
 
-@csrf_exempt
+
 @login_required
 def cadastrar_doacao(request):
     inicializar_banco()
@@ -51,7 +50,7 @@ def cadastrar_doacao(request):
     return render(request, "doacoes/doar_cadastro.html", {"active": "cadastro"})
 
 
-@csrf_exempt
+
 @login_required
 def excluir(request, id):
     inicializar_banco()
@@ -65,7 +64,7 @@ def excluir(request, id):
     return redirect("/doar")
 
 
-@csrf_exempt
+
 @login_required
 def editar(request, id):
     inicializar_banco()

@@ -1,11 +1,10 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from django.views.decorators.csrf import csrf_exempt
 
 from .services import cadastrar_usuario, inicializar_banco, usuario_existe, validar_login
 
 
-@csrf_exempt
+
 def login_view(request):
     inicializar_banco()
 
@@ -34,7 +33,6 @@ def login_view(request):
     return render(request, "usuarios/login.html")
 
 
-@csrf_exempt
 def registro(request):
     inicializar_banco()
 

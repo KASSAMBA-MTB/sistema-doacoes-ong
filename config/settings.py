@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     "apps.dashboards",
     "apps.doacoes",
     "apps.usuarios",
-    "calendario",
+    "apps.calendario",
 ]
 
 MIDDLEWARE = [
