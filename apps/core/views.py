@@ -1,7 +1,15 @@
+import logging
 from django.shortcuts import redirect
+from django.contrib import messages
 
-from apps.usuarios.services import inicializar_banco
+logger = logging.getLogger(__name__)
 
 def home(request):
-    inicializar_banco()
-    return redirect("/dashboard")
+    try:
+        return redirect("dashboard")
+
+    except Exception as e:
+        logger.error(f"Erro ao redirecionar home: {e}")
+        messages.error(request, "Erro ao acessar o sistema")
+
+        return redirect("login")

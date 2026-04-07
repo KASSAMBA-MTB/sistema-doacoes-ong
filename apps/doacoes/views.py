@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.contrib import messages
 
-from apps.usuarios.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from apps.usuarios.services import inicializar_banco
 
 from .models import Doacao
@@ -33,58 +33,86 @@ def listar_doacoes(request):
 
 
 
+
 @login_required
 def cadastrar_doacao(request):
-    inicializar_banco()
-
     if request.method == "POST":
-        item = request.POST.get("item")
-        quantidade = request.POST.get("quantidade")
+        try:
+            item = request.POST.get("item")
+            quantidade = request.POST.get("quantidade")
 
-        if item and quantidade:
-            Doacao.objects.create(item=item, quantidade=int(quantidade))
+            if not item:
+                raise ValueError("Item é obrigatório")
+
+            quantidade = int(quantidade)
+            if quantidade <= 0:
+                raise ValueError("Quantidade deve ser maior que 0")
+
+            Doacao.objects.create(item=item, quantidade=quantidade)
 
             messages.success(request, "Doação cadastrada com sucesso!")
-            return redirect("/doar")
+            return redirect("listar_doacoes")
 
-    return render(request, "doacoes/doar_cadastro.html", {"active": "cadastro"})
+        except ValueError as e:
+            messages.error(request, str(e))
 
+        except DatabaseError:
+            messages.error(request, "Erro ao salvar no banco")
+
+        except Exception:
+            messages.error(request, "Erro inesperado")
+
+    return render(request, "doacoes/doar_cadastro.html")
 
 
 @login_required
 def excluir(request, id):
-    inicializar_banco()
-
     if request.method != "POST":
-        return HttpResponseRedirect("/doar")
+        messages.warning(request, "Ação inválida")
+        return redirect("listar_doacoes")
 
-    Doacao.objects.filter(id=id).delete()
+    try:
+        doacao = Doacao.objects.get(id=id)
+        doacao.delete()
 
-    messages.success(request, "Doação excluída com sucesso!")
-    return redirect("/doar")
+        messages.success(request, "Excluído com sucesso")
 
+    except Doacao.DoesNotExist:
+        messages.error(request, "Doação não encontrada")
+
+    except Exception:
+        messages.error(request, "Erro ao excluir")
+
+    return redirect("listar_doacoes")
 
 
 @login_required
 def editar(request, id):
-    inicializar_banco()
-
-    doacao_obj = Doacao.objects.filter(id=id).first()
-    if not doacao_obj:
-        return redirect("/doar")
+    try:
+        doacao = Doacao.objects.get(id=id)
+    except Doacao.DoesNotExist:
+        messages.error(request, "Doação não encontrada")
+        return redirect("listar_doacoes")
 
     if request.method == "POST":
-        item = request.POST.get("item")
-        quantidade = request.POST.get("quantidade")
+        try:
+            item = request.POST.get("item")
+            quantidade = int(request.POST.get("quantidade"))
 
-        if item and quantidade:
-            doacao_obj.item = item
-            doacao_obj.quantidade = int(quantidade)
-            doacao_obj.save(update_fields=["item", "quantidade"])
+            if quantidade <= 0:
+                raise ValueError("Quantidade inválida")
 
-            messages.success(request, "Doação atualizada com sucesso!")
-            return redirect("/doar")
+            doacao.item = item
+            doacao.quantidade = quantidade
+            doacao.save()
 
-    doacao = (doacao_obj.item, doacao_obj.quantidade)
+            messages.success(request, "Atualizado com sucesso")
+            return redirect("listar_doacoes")
 
-    return render(request, "doacoes/editar.html", {"doacao": doacao, "id": id})
+        except ValueError as e:
+            messages.error(request, str(e))
+
+        except Exception:
+            messages.error(request, "Erro ao atualizar")
+
+    return render(request, "doacoes/editar.html", {"doacao": doacao})
