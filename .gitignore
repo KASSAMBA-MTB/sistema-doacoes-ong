@@ -1,16 +1,28 @@
-# Ambiente virtual
+# Virtual environment
+.venv/
 venv/
 
-# Python
+# Python cache and artifacts
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
 
-# Banco de dados
+# Django / local database files
+*.sqlite3
 *.db
 
-# Sistema
+# Environment files
+.env
+
+# Editor / OS
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
 
-# VS Code
-.vscode/
+
